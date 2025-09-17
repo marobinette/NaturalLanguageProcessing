@@ -158,54 +158,51 @@ class NLPMethods:
         Extract chapter data from text using a list of chapter titles.
         Returns a list of dictionaries containing chapter content and length metrics.
         """
-        # Split text into lines for easier processing
         lines = text.split('\n')
         chapters_data = []
         chapter_headers = ['FIRST PART', 'SECOND PART']
         
         for i, chapter_title in enumerate(chapters):
-            # Find the chapter title in the text
             chapter_start = -1
             for j, line in enumerate(lines):
                 if line.strip() == chapter_title:
-                    chapter_start = j
-                    break
+                    content_found = False
+                    for k in range(j + 1, min(j + 11, len(lines))):
+                        next_line = lines[k].strip()
+                        if next_line and not re.match(r'^[A-Z\s]+$', next_line) and len(next_line) > 20:
+                            content_found = True
+                            break
+                    
+                    if content_found:
+                        chapter_start = j
+                        break
             
             if chapter_start == -1:
-                continue  # Skip if chapter not found
+                continue
             
-            # Find the end of this chapter (next chapter title or end of text)
             chapter_end = len(lines)
             for j in range(chapter_start + 1, len(lines)):
                 next_line = lines[j].strip()
-                # Check if next line is another chapter title
                 if re.match(r'^[A-Z\s]+$', next_line) and len(next_line) > 2:
                     if next_line not in chapter_headers and next_line in chapters:
                         chapter_end = j
                         break
             
-            # Extract chapter content
             chapter_lines = lines[chapter_start:chapter_end]
-            # Clean up the content (remove the title line and extra whitespace)
             content_lines = chapter_lines[1:]  # Skip the title line
             content = '\n'.join(content_lines).strip()
             
-            # Only add if there's substantial content (more than just the title)
-            if len(content) > 100:  # Minimum content length threshold
-                # Count sentences
+            if len(content) > 100:
                 sentences = re.split(r'[.!?]+', content)
                 sentences = [s.strip() for s in sentences if s.strip()]
                 
-                # Count words (simple word count)
                 words = content.split()
                 word_count = len(words)
                 
-                # Count tokens using the same tokenizer as in fetch_corpus
                 tokenizer = RegexpTokenizer(r'\w+[\'\"]*|\'|\"')
                 tokens = tokenizer.tokenize(content)
                 token_count = len(tokens)
                 
-                # Calculate character count
                 char_count = len(content)
                 
                 chapters_data.append({
@@ -227,14 +224,12 @@ class NLPMethods:
         Extract chapters from text using regex to find all-caps chapter titles.
         Returns a list containing the chapter titles.
         """
-        # Split text into lines for easier processing
         lines = text.split('\n')
         found_chapters = []
         chapter_headers = ['FIRST PART', 'SECOND PART']
         
         for line in lines:
             line = line.strip()
-            # Match complete lines that are all-caps (not just individual words)
             if re.match(r'^[A-Z\s]+$', line) and len(line) > 2:
                 if line not in chapter_headers and line not in found_chapters:
                     found_chapters.append(line)
@@ -251,3 +246,72 @@ class NLPMethods:
         Returns a DataFrame with chapter information.
         """
         return pd.DataFrame(chapters_data)
+
+    def get_random_sample_chapter_data(self, chapters, text, sample_size=10):
+        """
+        Implement random sampling to extract random chapters from the corpus.
+        Returns a list of chapter data dictionaries for the randomly selected chapters.
+        """
+        if len(chapters) < sample_size:
+            print(f"Warning: Only {len(chapters)} chapters available, returning all chapters")
+            return self.get_chapter_data(chapters, text)
+        
+        random_chapters = self.get_chapters(text, True)
+        
+        all_chapter_data = self.get_chapter_data(chapters, text)
+        
+        random_chapter_data = [chapter for chapter in all_chapter_data 
+                             if chapter['chapter_title'] in random_chapters]
+        
+        return random_chapter_data
+
+    def get_systematic_sample_chapter_data(self, chapters, text, step_size=None):
+        """
+        Implement systematic sampling to extract every nth chapter.
+        If step_size is None, it will be calculated to get approximately 10 chapters.
+        Returns a list of chapter data dictionaries for the systematically selected chapters.
+        """
+        if step_size is None:
+            step_size = max(1, len(chapters) // 10)
+        
+        systematic_chapters = chapters[::step_size]
+        
+        all_chapter_data = self.get_chapter_data(chapters, text)
+        
+        systematic_chapter_data = [chapter for chapter in all_chapter_data 
+                                 if chapter['chapter_title'] in systematic_chapters]
+        
+        return systematic_chapter_data
+
+    def compare_sample_lengths(self, random_sample, systematic_sample):
+        """
+        Compare the average chapter length between random sample and systematic sample.
+        Returns a dictionary with comparison statistics.
+        """
+        random_avg_tokens = sum(chapter['token_count'] for chapter in random_sample) / len(random_sample)
+        random_avg_words = sum(chapter['word_count'] for chapter in random_sample) / len(random_sample)
+        random_avg_chars = sum(chapter['character_count'] for chapter in random_sample) / len(random_sample)
+        
+        systematic_avg_tokens = sum(chapter['token_count'] for chapter in systematic_sample) / len(systematic_sample)
+        systematic_avg_words = sum(chapter['word_count'] for chapter in systematic_sample) / len(systematic_sample)
+        systematic_avg_chars = sum(chapter['character_count'] for chapter in systematic_sample) / len(systematic_sample)
+        
+        return {
+            'random_sample': {
+                'count': len(random_sample),
+                'avg_tokens': random_avg_tokens,
+                'avg_words': random_avg_words,
+                'avg_chars': random_avg_chars
+            },
+            'systematic_sample': {
+                'count': len(systematic_sample),
+                'avg_tokens': systematic_avg_tokens,
+                'avg_words': systematic_avg_words,
+                'avg_chars': systematic_avg_chars
+            },
+            'differences': {
+                'token_diff': random_avg_tokens - systematic_avg_tokens,
+                'word_diff': random_avg_words - systematic_avg_words,
+                'char_diff': random_avg_chars - systematic_avg_chars
+            }
+        }
