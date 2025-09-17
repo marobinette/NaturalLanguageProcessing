@@ -4,6 +4,7 @@ from nltk.tokenize import RegexpTokenizer
 import re
 import pandas as pd
 import random
+from pprint import pprint
 
 class NLPMethods:
     """
@@ -105,6 +106,8 @@ class NLPMethods:
         print(f"Non-quote sentences: {len(non_quote_sentences)}")
         print(f"Quote tokens: {len(quote_tokens)}")
         print(f"Non-quote tokens: {len(non_quote_tokens)}")
+        print("Longest dialogue:")
+        pprint(self.get_longest_dialogue(content))
 
         return {
             'sentences': sentences,
@@ -235,6 +238,63 @@ class NLPMethods:
         Returns a DataFrame with chapter information.
         """
         return pd.DataFrame(chapters_data)
+
+    def get_longest_dialogue(self, text, distance_threshold=500):
+        """
+        Find the longest dialogue exchange (consecutive quotes) in the text.
+        Returns the exchange with the most quotes and its metrics.
+        """
+        # Find all quote positions and content
+        quote_positions = []
+        for pattern in self.QUOTE_EXTRACTION_PATTERNS:
+            for match in re.finditer(pattern, text, re.DOTALL):
+                quote_positions.append({
+                    'start': match.start(),
+                    'end': match.end(),
+                    'content': match.group(1).strip()
+                })
+        
+        # Sort by position
+        quote_positions.sort(key=lambda x: x['start'])
+        
+        # Group consecutive quotes into exchanges
+        exchanges = []
+        current_exchange = []
+        
+        for quote in quote_positions:
+            if not current_exchange:
+                current_exchange = [quote]
+            else:
+                # TODO: distance_threshold should be average length of chars in sentence
+                last_quote = current_exchange[-1]
+                if quote['start'] - last_quote['end'] < distance_threshold:
+                    current_exchange.append(quote)
+                else:
+                    # Start new exchange
+                    exchanges.append(current_exchange)
+                    current_exchange = [quote]
+    
+        # Don't forget the last exchange
+        if current_exchange:
+            exchanges.append(current_exchange)
+        
+        # Find exchange with most quotes
+        if not exchanges:
+            return None
+            
+        longest_exchange = max(exchanges, key=len)
+        
+        # Calculate metrics for the entire exchange
+        all_content = ' '.join([quote['content'] for quote in longest_exchange])
+        
+        return {
+            'exchange': longest_exchange,
+            'quote_count': len(longest_exchange),
+            'total_character_count': len(all_content),
+            'total_word_count': len(all_content.split()),
+            'total_sentence_count': len(re.split(r'[.!?]+', all_content)),
+            'exchange_content': all_content
+        }
 
     def get_random_sample_chapter_data(self, chapters, text, sample_size=10):
         """
