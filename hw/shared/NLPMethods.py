@@ -1,7 +1,6 @@
 import urllib.request
 import nltk
 from nltk.tokenize import RegexpTokenizer
-from bs4 import BeautifulSoup
 import re
 import pandas as pd
 import random
@@ -29,7 +28,6 @@ class NLPMethods:
         """
         Initialize the NLPMethods class.
         """
-        # Download required NLTK data
         try:
             nltk.data.find('tokenizers/punkt')
         except LookupError:
@@ -50,7 +48,6 @@ class NLPMethods:
         response = urllib.request.urlopen(url)
         text = response.read().decode('utf-8')
         
-        # Find the start marker
         start_marker = "*** START OF THE PROJECT GUTENBERG EBOOK SIDDHARTHA ***"
         end_marker = "*** END OF THE PROJECT GUTENBERG EBOOK SIDDHARTHA ***"
         
@@ -58,12 +55,10 @@ class NLPMethods:
         end_index = text.find(end_marker)
         
         if start_index != -1 and end_index != -1:
-            # Extract text between the markers
             start_index += len(start_marker)
             extracted_text = text[start_index:end_index].strip()
             return extracted_text
         else:
-            # If markers not found, return original text
             print("Warning: Gutenberg markers not found, returning original text")
             return text
 
@@ -291,27 +286,32 @@ class NLPMethods:
         random_avg_tokens = sum(chapter['token_count'] for chapter in random_sample) / len(random_sample)
         random_avg_words = sum(chapter['word_count'] for chapter in random_sample) / len(random_sample)
         random_avg_chars = sum(chapter['character_count'] for chapter in random_sample) / len(random_sample)
+        random_avg_sentences = sum(chapter['sentence_count'] for chapter in random_sample) / len(random_sample)
         
         systematic_avg_tokens = sum(chapter['token_count'] for chapter in systematic_sample) / len(systematic_sample)
         systematic_avg_words = sum(chapter['word_count'] for chapter in systematic_sample) / len(systematic_sample)
         systematic_avg_chars = sum(chapter['character_count'] for chapter in systematic_sample) / len(systematic_sample)
+        systematic_avg_sentences = sum(chapter['sentence_count'] for chapter in systematic_sample) / len(systematic_sample)
         
         return {
             'random_sample': {
                 'count': len(random_sample),
                 'avg_tokens': random_avg_tokens,
                 'avg_words': random_avg_words,
-                'avg_chars': random_avg_chars
+                'avg_chars': random_avg_chars,
+                'avg_sentences': random_avg_sentences
             },
             'systematic_sample': {
                 'count': len(systematic_sample),
                 'avg_tokens': systematic_avg_tokens,
                 'avg_words': systematic_avg_words,
-                'avg_chars': systematic_avg_chars
+                'avg_chars': systematic_avg_chars,
+                'avg_sentences': systematic_avg_sentences
             },
             'differences': {
                 'token_diff': random_avg_tokens - systematic_avg_tokens,
                 'word_diff': random_avg_words - systematic_avg_words,
-                'char_diff': random_avg_chars - systematic_avg_chars
+                'char_diff': random_avg_chars - systematic_avg_chars,
+                'sentence_diff': random_avg_sentences - systematic_avg_sentences
             }
         }
