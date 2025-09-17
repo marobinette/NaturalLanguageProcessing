@@ -4,6 +4,7 @@ from nltk.tokenize import RegexpTokenizer
 from bs4 import BeautifulSoup
 import re
 import pandas as pd
+import random
 
 class NLPMethods:
     """
@@ -221,7 +222,7 @@ class NLPMethods:
         
         return chapters_data
 
-    def get_chapters(self, text):
+    def get_chapters(self, text, shuffle=False):
         """
         Extract chapters from text using regex to find all-caps chapter titles.
         Returns a list containing the chapter titles.
@@ -237,7 +238,11 @@ class NLPMethods:
             if re.match(r'^[A-Z\s]+$', line) and len(line) > 2:
                 if line not in chapter_headers and line not in found_chapters:
                     found_chapters.append(line)
-        
+        if shuffle:
+            shuffled = found_chapters.copy()
+            random.shuffle(shuffled)
+            random_sample = shuffled[:10]
+            return random_sample
         return found_chapters
     
     def chapters_to_dataframe(self, chapters_data):
