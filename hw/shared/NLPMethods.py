@@ -8,7 +8,6 @@ class NLPMethods:
     """
     A class containing various NLP methods and utilities.
     """
-    
     # Quote patterns for extraction and removal
     QUOTE_EXTRACTION_PATTERNS = [
         r'"([^"]*)"',      # Straight double quotes
@@ -47,68 +46,51 @@ class NLPMethods:
         """
         response = urllib.request.urlopen(url)
         content = response.read().decode('utf-8')
-        
-        # Extract quotes BEFORE any text processing to preserve multiline quotes
         quotes = self.extract_quotes_naive(content)
-        
-        # Basic cleaning
-        content = ' '.join(content.split())  # Normalize whitespace
-        
-        # Remove quotes from content to get non-quote text
+        content = ' '.join(content.split()) 
         non_quote_content = self.remove_quotes_naive(content)
-        
-        # Simple sentence splitting using regex
         sentences = re.split(r'[.!?]+', content)
         sentences = [s.strip() for s in sentences if s.strip()]
-        
-        # Split sentences into quote-containing and non-quote sentences
         quote_sentences = []
         non_quote_sentences = []
         
         for sentence in sentences:
-            # Check if sentence contains actual quoted text using our patterns
             has_quotes = False
             for pattern in self.QUOTE_EXTRACTION_PATTERNS:
                 if re.search(pattern, sentence):
                     has_quotes = True
                     break
-            
+ 
             if has_quotes:
                 quote_sentences.append(sentence)
             else:
                 non_quote_sentences.append(sentence)
-        
-        # Tokenize each sentence into words (keeping quotes)
+
         tokenizer = RegexpTokenizer(r'\w+[\'\"]*|\'|\"')
         tokenized_sentences = [tokenizer.tokenize(sentence) for sentence in sentences]
-        
-        # Flatten for backward compatibility
+
         all_tokens = [token for sentence in tokenized_sentences for token in sentence]
-        
-        # Separate quote tokens from non-quote tokens
         quote_tokens = []
         non_quote_tokens = []
-        
         for token in all_tokens:
-            # Check if token is part of actual quoted text using our patterns
             is_quote_token = False
             for pattern in self.QUOTE_EXTRACTION_PATTERNS:
                 if re.search(pattern, token):
                     is_quote_token = True
                     break
-            
+
             if is_quote_token:
                 quote_tokens.append(token)
             else:
                 non_quote_tokens.append(token)
-        
+
         print(f"Number of sentences: {len(sentences)}")
         print(f"Number of quotes found: {len(quotes)}")
         print(f"Quote sentences: {len(quote_sentences)}")
         print(f"Non-quote sentences: {len(non_quote_sentences)}")
         print(f"Quote tokens: {len(quote_tokens)}")
         print(f"Non-quote tokens: {len(non_quote_tokens)}")
-        
+
         return {
             'sentences': sentences,
             'tokenized_sentences': tokenized_sentences,
@@ -130,7 +112,7 @@ class NLPMethods:
         for pattern in self.QUOTE_EXTRACTION_PATTERNS:
             quotes = re.findall(pattern, text, re.DOTALL)
             all_quotes.extend([quote.strip() for quote in quotes if quote.strip()])
-        
+
         return all_quotes
 
     def remove_quotes_naive(self, text):
@@ -140,9 +122,8 @@ class NLPMethods:
         non_quote_text = text
         for pattern in self.QUOTE_REMOVAL_PATTERNS:
             non_quote_text = re.sub(pattern, '', non_quote_text, flags=re.DOTALL)
-        
-        # Clean up extra whitespace
+
         non_quote_text = ' '.join(non_quote_text.split())
-        
+
         return non_quote_text
     
