@@ -3,6 +3,7 @@ import nltk
 from nltk.tokenize import RegexpTokenizer
 from bs4 import BeautifulSoup
 import re
+import pandas as pd
 
 class NLPMethods:
     """
@@ -40,15 +41,39 @@ class NLPMethods:
         """
         print("hello from class")
 
-    def fetch_corpus(self, url):
+    def remove_gutenberg_header(self, url):
         """
-        Fetch a corpus from a given URL and return sentences, tokens, quotes, and non-quotes.
+        Extract text between Gutenberg start and end markers.
+        Returns only the actual book content, removing headers and footers.
         """
         response = urllib.request.urlopen(url)
-        content = response.read().decode('utf-8')
-        quotes = self.extract_quotes_naive(content)
+        text = response.read().decode('utf-8')
+        
+        # Find the start marker
+        start_marker = "*** START OF THE PROJECT GUTENBERG EBOOK SIDDHARTHA ***"
+        end_marker = "*** END OF THE PROJECT GUTENBERG EBOOK SIDDHARTHA ***"
+        
+        start_index = text.find(start_marker)
+        end_index = text.find(end_marker)
+        
+        if start_index != -1 and end_index != -1:
+            # Extract text between the markers
+            start_index += len(start_marker)
+            extracted_text = text[start_index:end_index].strip()
+            return extracted_text
+        else:
+            # If markers not found, return original text
+            print("Warning: Gutenberg markers not found, returning original text")
+            return text
+
+    def fetch_corpus(self, text):
+        """
+        Process text and return sentences, tokens, quotes, and non-quotes.
+        """
+        content = text
+        quotes = self.extract_quotes(content)
         content = ' '.join(content.split()) 
-        non_quote_content = self.remove_quotes_naive(content)
+        non_quote_content = self.remove_quotes(content)
         sentences = re.split(r'[.!?]+', content)
         sentences = [s.strip() for s in sentences if s.strip()]
         quote_sentences = []
@@ -103,7 +128,7 @@ class NLPMethods:
             'non_quote_tokens': non_quote_tokens
         }
 
-    def extract_quotes_naive(self, text):
+    def extract_quotes(self, text):
         """
         Naive approach: Extract anything between double quotes.
         Returns list of quoted text (without the quote marks).
@@ -115,7 +140,7 @@ class NLPMethods:
 
         return all_quotes
 
-    def remove_quotes_naive(self, text):
+    def remove_quotes(self, text):
         """
         Remove all quoted text from the content, leaving only narrative/non-dialogue.
         """
@@ -127,3 +152,97 @@ class NLPMethods:
 
         return non_quote_text
     
+    def get_chapter_data(self, chapters, text):    
+        """
+        Extract chapter data from text using a list of chapter titles.
+        Returns a list of dictionaries containing chapter content and length metrics.
+        """
+        # Split text into lines for easier processing
+        lines = text.split('\n')
+        chapters_data = []
+        chapter_headers = ['FIRST PART', 'SECOND PART']
+        
+        for i, chapter_title in enumerate(chapters):
+            # Find the chapter title in the text
+            chapter_start = -1
+            for j, line in enumerate(lines):
+                if line.strip() == chapter_title:
+                    chapter_start = j
+                    break
+            
+            if chapter_start == -1:
+                continue  # Skip if chapter not found
+            
+            # Find the end of this chapter (next chapter title or end of text)
+            chapter_end = len(lines)
+            for j in range(chapter_start + 1, len(lines)):
+                next_line = lines[j].strip()
+                # Check if next line is another chapter title
+                if re.match(r'^[A-Z\s]+$', next_line) and len(next_line) > 2:
+                    if next_line not in chapter_headers and next_line in chapters:
+                        chapter_end = j
+                        break
+            
+            # Extract chapter content
+            chapter_lines = lines[chapter_start:chapter_end]
+            # Clean up the content (remove the title line and extra whitespace)
+            content_lines = chapter_lines[1:]  # Skip the title line
+            content = '\n'.join(content_lines).strip()
+            
+            # Only add if there's substantial content (more than just the title)
+            if len(content) > 100:  # Minimum content length threshold
+                # Count sentences
+                sentences = re.split(r'[.!?]+', content)
+                sentences = [s.strip() for s in sentences if s.strip()]
+                
+                # Count words (simple word count)
+                words = content.split()
+                word_count = len(words)
+                
+                # Count tokens using the same tokenizer as in fetch_corpus
+                tokenizer = RegexpTokenizer(r'\w+[\'\"]*|\'|\"')
+                tokens = tokenizer.tokenize(content)
+                token_count = len(tokens)
+                
+                # Calculate character count
+                char_count = len(content)
+                
+                chapters_data.append({
+                    'chapter_title': chapter_title,
+                    'chapter_number': i + 1,
+                    'start_line': chapter_start + 1,  # 1-indexed
+                    'end_line': chapter_end,
+                    'sentence_count': len(sentences),
+                    'word_count': word_count,
+                    'token_count': token_count,
+                    'character_count': char_count,
+                    'content': content
+                })
+        
+        return chapters_data
+
+    def get_chapters(self, text):
+        """
+        Extract chapters from text using regex to find all-caps chapter titles.
+        Returns a list containing the chapter titles.
+        """
+        # Split text into lines for easier processing
+        lines = text.split('\n')
+        found_chapters = []
+        chapter_headers = ['FIRST PART', 'SECOND PART']
+        
+        for line in lines:
+            line = line.strip()
+            # Match complete lines that are all-caps (not just individual words)
+            if re.match(r'^[A-Z\s]+$', line) and len(line) > 2:
+                if line not in chapter_headers and line not in found_chapters:
+                    found_chapters.append(line)
+        
+        return found_chapters
+    
+    def chapters_to_dataframe(self, chapters_data):
+        """
+        Convert chapters data to a pandas DataFrame.
+        Returns a DataFrame with chapter information.
+        """
+        return pd.DataFrame(chapters_data)
