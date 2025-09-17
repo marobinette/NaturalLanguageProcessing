@@ -34,12 +34,6 @@ class NLPMethods:
             print("Downloading NLTK Punkt tokenizer...")
             nltk.download('punkt', quiet=True)
     
-    def hello_from_class(self):
-        """
-        A simple method that prints a greeting message.
-        """
-        print("hello from class")
-
     def remove_gutenberg_header(self, url):
         """
         Extract text between Gutenberg start and end markers.

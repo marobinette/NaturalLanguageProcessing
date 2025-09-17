@@ -73,6 +73,48 @@ corpus_data = nlp_methods.fetch_corpus(text)
 
 - **nltk**: Natural Language Toolkit for tokenization
 - **pandas**: Data manipulation and analysis
+- **flake8**: Python code linting and style checking
+
+## Code Quality
+
+### Linting with Flake8
+
+This project uses flake8 for code quality and style checking. Flake8 is configured in `.flake8` with sensible defaults.
+
+**Basic usage:**
+```bash
+# Check all Python files in your project
+flake8 .
+
+# Check a specific file
+flake8 hw/shared/NLPMethods.py
+
+# Check with more verbose output
+flake8 --show-source hw/shared/NLPMethods.py
+
+# Check and show statistics
+flake8 --statistics .
+```
+
+**Common flake8 error codes:**
+- **E501**: Line too long (over 88 characters)
+- **E302**: Expected 2 blank lines before class/function definition
+- **W293**: Blank line contains whitespace
+- **W291**: Trailing whitespace
+- **W292**: No newline at end of file
+
+**Configuration:**
+The `.flake8` file configures:
+- Max line length: 88 characters
+- Excludes common directories (`.git`, `__pycache__`, etc.)
+- Ignores certain style rules for better compatibility
+
+### Additional Code Quality Tools
+
+Consider these complementary tools:
+- **black**: Auto-formats your code (complements flake8)
+- **isort**: Sorts and organizes imports
+- **pylint**: More comprehensive but also more opinionated
 
 ## Troubleshooting
 
