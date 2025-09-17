@@ -56,7 +56,7 @@ class NLPMethods:
             print("Warning: Gutenberg markers not found, returning original text")
             return text
 
-    def fetch_corpus(self, text):
+    def get_processed_text(self, text):
         """
         Process text and return sentences, tokens, quotes, and non-quotes.
         """

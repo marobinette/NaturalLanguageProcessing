@@ -55,13 +55,13 @@ nlp_methods = NLPMethods()
 
 # Use the methods
 text = nlp_methods.remove_gutenberg_header("https://www.gutenberg.org/cache/epub/2500/pg2500.txt")
-corpus_data = nlp_methods.fetch_corpus(text)
+corpus_data = nlp_methods.get_processed_text(text)
 ```
 
 ## Available Methods
 
 - `remove_gutenberg_header(url)`: Extract clean text from Project Gutenberg URLs
-- `fetch_corpus(text)`: Process text and extract sentences, tokens, quotes
+- `get_processed_text(text)`: Process text and extract sentences, tokens, quotes
 - `extract_quotes(text)`: Extract quoted text from content
 - `remove_quotes(text)`: Remove quotes, leaving narrative text
 - `get_chapters(text)`: Find chapter titles in text
