@@ -1,0 +1,87 @@
+THE UNIVERSITY OF VERMONT
+ELECTRICAL ENGINEERING
+ELECTRICAL ENGINEERING
+[URL]
+OVERVIEW
+The Electrical Engineering (EE) program at the University of
+Vermont is at the forefront of research in the areas of digital
+signal processing, control systems, power and energy systems,
+wireless communications, and electronic circuit and system
+design and testing. This rigorous and focused program offers
+competitive funding and prepares graduate students for careers
+in research and technical leadership. Graduate students can
+contribute to interdisciplinary research within a broad range of
+applications, including power/energy, biomedical, aerospace, and
+transportation. In addition, the EE program partners with other
+academic units to offer M.S. and Ph.D. degrees in Materials Science
+and a Ph.D. degree in Biomedical Engineering.
+DEGREES
+Electrical Engineering AMP
+Electrical Engineering M.S.
+Electrical Engineering Ph.D.
+FACULTY
+Almassalkhi, Mads; Associate Professor, Department of Electrical
+and Biomedical Engineering; PhD, University of Michigan 
+Bates, Jason H. T.; Professor, Department of Electrical and
+Biomedical Engineering; DSc, Canterbury University; PhD,
+University of Otago 
+Chevalier, Samuel; Assistant Professor, Department of Electrical
+and Biomedical Engineering; PhD, Massachusetts Institute of
+Technology 
+Cipolla, Marilyn Jo; Professor, Department of Neurological
+Sciences; Chair, Department of Electrical and Biomedical
+Engineering; PhD, University of Vermont 
+Duffaut Espinosa, Luis; Assistant Professor, Department of
+Electrical and Biomedical Engineering; PhD, Old Dominion
+University 
+Frolik, Jeff L.; Professor, Department of Electrical and Biomedical
+Engineering; PhD, University of Michigan  
+Lee, Byung S.; Professor, Department of Computer Science; PhD,
+Stanford University 
+Ossareh, Hamid-Reza; Associate Professor, Department of
+Electrical and Biomedical Engineering, PhD; University of Michigan 
+Pandey, Amritanshu; Assistant Professor, Department of Electrical
+and Biomedical Engineering, PhD, Camegie Mellon University 
+Wshah, Safwan; Associate Professor, Department of Computer
+Science; PhD, State University of New York at Buffalo  
+Xia, Tian; Professor, Department of Electrical and Biomedical
+Engineering; PhD, University of Rhode Island
+Computer Engineering Courses
+CMPE 5220: Advanced Computer Architecture. 3 Credits. Provides a thorough and sophisticated examination of various
+hardware aspects of modem computers, including: virtual memory,
+instruction-set architectures, instruction-level parallelism through
+pipelining, caches and cache coherence, threads, vector processors,
+and GPUs. Prerequisites: Familiarity with topics of computer
+organization as would come from the equivalent of CS 2210 or
+CMPE 2210; Graduate student. Credit not awarded for both
+CMPE 5220 and CS 3220 or CMPE 3220: Cross-listed with:
+CS 5220: CMPE 5410: Digital VLSI Circuit Design. 0 or 3 Credits. Covers the techniques for the design, analysis and layout of digital
+CMOS circuits and systems. Major topics include MOSFET
+basics (structure and behavior of a MOSFET, CMOS fabrication,
+and design rules), detailed analysis of the CMOS circuits and
+systems (static behavior, ratioed vs. ratioless design), noise margins,
+computing rise and fall times, delay models, resistance. Prerequisite:
+Electrical Engineering Graduate student, Computer Science
+Graduate student, or Instructor permission. Cross-listed with:
+EE 5410: CMPE 5540: Real-Time Control Systems. 3 Credits. Digital control systems analysis and design. Topics include: difference
+equations, the Z-transforms, discrete-time transfer functions, state-
+space models, sampled-data systems, discretization, real-time control,
+microprocessor implementation, and optimal control. Project-
+based final. Prerequisite: Electrical Engineering Graduate student,
+Computer Science Graduate student, or Instructor permission.
+Cross-listed with: EE 5540: CMPE 5610: Information Theory. 3 Credits. Introduction to probability concepts of information theory; entropy
+of probability models; theoretical derivations of channel capacity;
+coding methods and theorems, sampling theorems. Prerequisite:
+Graduate student or Instructor permission. Cross-listed with:
+EE 5610, CS 5610: CMPE 5810: Digital Computer Design. 3 Credits. To gain a solid understanding of digital computer operating
+mechanisms and reconfigurable computing, and advance into hands-
+on experiences to design and debug digital computer system and
+embedded system. Field programmable gate arrays (FPGAs) will
+be utilized as the development platform. Prerequisite: Electrical
+Engineering Graduate student, Computer Science Graduate student,
+or Instructor permission. Cross-listed with: EE 5810, CS 5810: CMPE 5990: Special Topics. 1-18 Credits. See Schedule of Courses for specific titles.
+CMPE 5991: Intemship. 1-18 Credits. On-site supervised work experience combined with a structured
+academic leaming plan directed by a faculty member or a faculty-staff
+team in which a faculty member is the instructor of record, for which
+academic credit is awarded. Offered at department discretion.
+1
