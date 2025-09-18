@@ -102,14 +102,18 @@ class NLPMethods:
             else:
                 non_quote_tokens.append(token)
 
-        print(f"Number of sentences: {len(sentences)}")
+        # print(f"Number of sentences: {len(sentences)}")
         print(f"Number of quotes found: {len(quotes)}")
-        print(f"Quote sentences: {len(quote_sentences)}")
-        print(f"Non-quote sentences: {len(non_quote_sentences)}")
-        print(f"Quote tokens: {len(quote_tokens)}")
-        print(f"Non-quote tokens: {len(non_quote_tokens)}")
-        print("Longest dialogue:")
-        pprint(self.get_longest_dialogue(content))
+        # print(f"Quote sentences: {len(quote_sentences)}")
+        # print(f"Non-quote sentences: {len(non_quote_sentences)}")
+        # print(f"Quote tokens: {len(quote_tokens)}")
+        # print(f"Non-quote tokens: {len(non_quote_tokens)}")
+        longest_quote = max(quotes, key=len) if quotes else None
+        if longest_quote:
+            print(f"Longest dialogue instance ({len(longest_quote)} characters):")
+            print(f'"{longest_quote}"')
+        else:
+            print("No quotes found")
 
         return {
             'sentences': sentences,
@@ -125,8 +129,8 @@ class NLPMethods:
 
     def extract_quotes(self, text):
         """
-        Naive approach: Extract anything between double quotes.
-        Returns list of quoted text (without the quote marks).
+        Extract anything between double quotes.
+        Returns list of quoted text.
         """
         all_quotes = []
         for pattern in self.QUOTE_EXTRACTION_PATTERNS:
@@ -224,7 +228,7 @@ class NLPMethods:
         
         for line in lines:
             line = line.strip()
-            if re.match(r'^[A-Z\s]+$', line) and len(line) > 2:
+            if re.match(r'^[A-Z\s]+$', line) and len(line) >= 2:
                 if line not in chapter_headers and line not in found_chapters:
                     found_chapters.append(line)
         if shuffle:
