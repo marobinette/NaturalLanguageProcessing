@@ -50,17 +50,17 @@ sys.path.append('../shared')
 
 from NLPMethods import NLPMethods
 
-# Create an instance (automatically downloads NLTK data)
-nlp_methods = NLPMethods()
+# Create an instance with a URL (automatically downloads NLTK data)
+nlp_methods = NLPMethods("https://www.gutenberg.org/cache/epub/2500/pg2500.txt")
 
 # Use the methods
-text = nlp_methods.remove_gutenberg_header("https://www.gutenberg.org/cache/epub/2500/pg2500.txt")
-corpus_data = nlp_methods.get_processed_text(text)
+clean_text = nlp_methods.remove_gutenberg_header()
+corpus_data = nlp_methods.get_processed_text(clean_text)
 ```
 
 ## Available Methods
 
-- `remove_gutenberg_header(url)`: Extract clean text from Project Gutenberg URLs
+- `remove_gutenberg_header()`: Extract clean text from the URL provided during initialization
 - `get_processed_text(text)`: Process text and extract sentences, tokens, quotes
 - `extract_quotes(text)`: Extract quoted text from content
 - `remove_quotes(text)`: Remove quotes, leaving narrative text

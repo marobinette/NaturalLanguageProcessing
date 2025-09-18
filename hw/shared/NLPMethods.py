@@ -25,7 +25,7 @@ class NLPMethods:
         r"'[^']*'",        # Straight single quotes
     ]
     
-    def __init__(self):
+    def __init__(self, url):
         """
         Initialize the NLPMethods class.
         """
@@ -34,13 +34,15 @@ class NLPMethods:
         except LookupError:
             print("Downloading NLTK Punkt tokenizer...")
             nltk.download('punkt', quiet=True)
+        
+        self.url = url
     
-    def remove_gutenberg_header(self, url):
+    def remove_gutenberg_header(self):
         """
         Extract text between Gutenberg start and end markers.
         Returns only the actual book content, removing headers and footers.
         """
-        response = urllib.request.urlopen(url)
+        response = urllib.request.urlopen(self.url)
         text = response.read().decode('utf-8')
         
         start_marker = "*** START OF THE PROJECT GUTENBERG EBOOK SIDDHARTHA ***"
