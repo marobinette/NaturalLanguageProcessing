@@ -296,6 +296,7 @@ class NLPMethods:
             'exchange_content': all_content
         }
 
+    # TODO: Create sampling classes for each sampling method
     def get_random_sample_chapter_data(self, chapters, text, sample_size=10):
         """
         Implement random sampling to extract random chapters from the corpus.
@@ -314,6 +315,7 @@ class NLPMethods:
         
         return random_chapter_data
 
+    # TODO: Create sampling classes for each sampling method
     def get_systematic_sample_chapter_data(self, chapters, text, step_size=None):
         """
         Implement systematic sampling to extract every nth chapter.
