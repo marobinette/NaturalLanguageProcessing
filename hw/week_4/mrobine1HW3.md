@@ -19,3 +19,6 @@ start_index = random.randint(0, step_size - 1)
 ```
 
 This approach ensures more even distribution across the text but maintains the random element through the starting point selection. I definitely could have done more sophisticated stratification by chapter length or position, but given the relatively small corpus size and the need to keep the implementation straightforward, I stuck with these two standard approaches. The comparison between the methods showed some interesting differences. In running the sampling cell there was never a huge disparity in word count, generally a difference of around 300~ words, but the difference looked greater in tokens, and the largest in char count.
+
+### Describe OCR failures and how to handle them
+This process was without fail. However, my approach was quite naive. I simply defined a rectangle for the contents I wanted to capture using margins. While this is not a scalable solution it did the job in this context. (I was spending too much time coding.) The content was preserved but reads top to bottom as seen [here](https://github.com/marobinette/NaturalLanguageProcessing/blob/main/hw/week_4/OCR_me_electricalengineering_processed.txt).
