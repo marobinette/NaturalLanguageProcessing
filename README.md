@@ -4,10 +4,6 @@ This project contains NLP methods and utilities for text processing, including q
 
 ## Setup
 
-### Prerequisites
-- Python 3.7 or higher
-- Internet connection (for downloading NLTK data and Project Gutenberg texts)
-
 ### Installation
 
 1. Clone or download this repository
@@ -69,70 +65,6 @@ random_sample = nlp_methods.get_random_sample_chapter_data(chapters, clean_text)
 systematic_sample = nlp_methods.get_systematic_sample_chapter_data(chapters, clean_text)
 comparison = nlp_methods.compare_sample_lengths(random_sample, systematic_sample)
 ```
-
-#### Using OCR for PDF Processing
-
-```python
-import sys
-sys.path.append('../shared')
-
-from ocr import OCR
-
-# Create OCR instance
-ocr = OCR()
-
-# Process a PDF file completely
-results = ocr.process_pdf_complete("path/to/your/document.pdf")
-
-# Or use individual methods for more control
-pages_data = ocr.extract_text_from_pdf("path/to/your/document.pdf")
-if pages_data:
-    full_text = "\n".join([page['text'] for page in pages_data])
-    
-    # Detect document type and clean accordingly
-    doc_type = ocr.detect_document_type(full_text)
-    if doc_type == "academic":
-        cleaned_text = ocr.clean_academic_document(full_text)
-    elif doc_type == "legal":
-        cleaned_text = ocr.clean_legal_document(full_text)
-    else:
-        cleaned_text = full_text
-    
-    # Fix OCR errors
-    fixed_text = ocr.fix_ocr_errors(cleaned_text)
-    
-    # Analyze extraction quality
-    issues, issues_content = ocr.analyze_extraction_quality(fixed_text, "Document")
-```
-
-#### Combined Usage Example
-
-```python
-import sys
-sys.path.append('../shared')
-
-from nlp_methods import NLPMethods
-from ocr import OCR
-
-# Process a PDF first
-ocr = OCR()
-pdf_results = ocr.process_pdf_complete("academic_paper.pdf")
-
-if pdf_results['method'] != 'failed':
-    # Then analyze the extracted text with NLP methods
-    nlp_methods = NLPMethods("dummy_url")  # URL not needed for text analysis
-    
-    # Analyze the processed text
-    corpus_data = nlp_methods.get_processed_text(pdf_results['fixed_text'])
-    
-    # Extract quotes and analyze dialogue
-    quotes = nlp_methods.extract_quotes(pdf_results['fixed_text'])
-    longest_dialogue = nlp_methods.get_longest_dialogue(pdf_results['fixed_text'])
-    
-    print(f"Found {len(quotes)} quotes in the document")
-    print(f"Longest dialogue has {longest_dialogue['quote_count']} quotes")
-```
-
 ## Available Classes and Methods
 
 ### NLPMethods Class
@@ -167,42 +99,6 @@ nlp_methods = NLPMethods(url)
 #### Advanced Analysis Methods
 
 - **`get_longest_dialogue(text, distance_threshold=500)`**: Find the longest dialogue exchange (consecutive quotes) in the text with comprehensive metrics
-
-### OCR Class
-
-The `OCR` class provides comprehensive PDF processing functionality using PyMuPDF for text extraction, cleaning, and analysis.
-
-#### Initialization
-```python
-ocr = OCR()
-```
-
-#### PDF Text Extraction Methods
-
-- **`extract_text_from_pdf(pdf_path)`**: Extract text from PDF using PyMuPDF. Returns list of page data dictionaries
-- **`extract_with_layout(pdf_path, page_num=0)`**: Extract text with detailed formatting information including font, size, and positioning data
-- **`check_pdf_text_extractable(pdf_path)`**: Check if PDF has extractable text (vs. scanned/image-based)
-
-#### Document Analysis Methods
-
-- **`analyze_document_structure(elements)`**: Analyze document structure based on formatting elements (headers, font sizes, etc.)
-- **`detect_document_type(text)`**: Detect document type (academic, legal, or general) based on content analysis
-- **`analyze_extraction_quality(text, doc_name)`**: Analyze quality of extracted text and identify potential issues
-
-#### Text Cleaning Methods
-
-- **`clean_academic_document(text)`**: Clean academic documents by removing headers, footers, and standardizing format
-- **`clean_legal_document(text)`**: Clean legal documents by standardizing formatting and structure
-- **`fix_ocr_errors(text)`**: Fix common OCR errors like character substitutions and broken words
-
-#### Error Detection and Correction
-
-- **`find_ocr_errors(text)`**: Find common OCR errors including character substitutions, broken words, and suspicious patterns
-- **`compare_versions(original, cleaned, fixed, doc_name)`**: Compare different versions of processed text with statistics
-
-#### Complete Processing Pipeline
-
-- **`process_pdf_complete(pdf_path, output_dir="processed_pdfs")`**: Complete PDF processing pipeline that extracts, cleans, fixes errors, and saves processed text
 
 ## Dependencies
 
