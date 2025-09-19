@@ -151,6 +151,25 @@ class NLPMethods:
         Extract chapter data from text using a list of chapter titles.
         Returns a list of dictionaries containing chapter content and length metrics.
         """
+        # Remove table of contents by finding the dedication line
+        dedication_marker = "To Romain Rolland, my dear friend"
+        dedication_index = text.find(dedication_marker)
+        
+        if dedication_index != -1:
+            # Find the start of the actual content after the dedication
+            lines = text[dedication_index:].split("\n")
+            # Skip the dedication line and any empty lines after it
+            content_start = 0
+            for i, line in enumerate(lines):
+                clean_line = line.strip().replace('\r', '')
+                if clean_line and clean_line != dedication_marker:
+                    content_start = i
+                    break
+            # Reconstruct text starting from actual content
+            text = "\n".join(lines[content_start:])
+        
+        # Clean up carriage returns from the text
+        text = text.replace('\r', '')
         lines = text.split("\n")
         chapters_data = []
         chapter_headers = ["FIRST PART", "SECOND PART"]
@@ -330,16 +349,28 @@ class NLPMethods:
         return random_chapter_data
 
     # TODO: Create sampling classes for each sampling method
-    def get_systematic_sample_chapter_data(self, chapters, text, step_size=None):
+    def get_systematic_sample_chapter_data(self, chapters, text, step_size=None, sample_size=10):
         """
-        Implement systematic sampling to extract every nth chapter.
-        If step_size is None, it will be calculated to get approximately 10 chapters.
+        Implement systematic sampling to extract every nth chapter starting from a random point.
+        If step_size is None, it will be calculated to get approximately sample_size chapters.
         Returns a list of chapter data dictionaries for the systematically selected chapters.
         """
         if step_size is None:
-            step_size = max(1, len(chapters) // 10)
-
-        systematic_chapters = chapters[::step_size]
+            step_size = max(1, len(chapters) // sample_size)
+        
+        # Randomly select starting point for systematic sampling
+        # If step_size is 1, we can start from any position
+        if step_size == 1:
+            start_index = random.randint(0, len(chapters) - 1)
+        else:
+            start_index = random.randint(0, step_size - 1)
+        
+        # Select chapters using systematic sampling with random start
+        systematic_chapters = []
+        current_index = start_index
+        while current_index < len(chapters) and len(systematic_chapters) < sample_size:
+            systematic_chapters.append(chapters[current_index])
+            current_index += step_size
 
         all_chapter_data = self.get_chapter_data(chapters, text)
 
