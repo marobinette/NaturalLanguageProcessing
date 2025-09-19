@@ -63,17 +63,17 @@ class OCR:
                 print(f"   Page {page_num + 1}: {len(text)} characters, {len(text.split())} words")
             
             doc.close()
-            print(f"✓ Successfully extracted {len(pages_data)} pages")
+            print(f"Successfully extracted {len(pages_data)} pages")
             return pages_data
             
         except FileNotFoundError:
-            print(f"✗ Error: PDF file not found at path: {pdf_path}")
+            print(f"Error: PDF file not found at path: {pdf_path}")
             return None
         except PermissionError:
-            print(f"✗ Error: Permission denied when trying to read: {pdf_path}")
+            print(f"Error: Permission denied when trying to read: {pdf_path}")
             return None
         except Exception as e:
-            print(f"✗ Error reading PDF: {e}")
+            print(f"Error reading PDF: {e}")
             return None
     
     def extract_with_layout(self, pdf_path: str, page_num: int = 0) -> Optional[List[Dict[str, Any]]]:
@@ -111,7 +111,7 @@ class OCR:
             return formatted_elements
             
         except Exception as e:
-            print(f"✗ Error extracting layout: {e}")
+            print(f"Error extracting layout: {e}")
             return None
     
     def analyze_document_structure(self, elements: List[Dict[str, Any]]) -> None:
@@ -128,7 +128,7 @@ class OCR:
         font_sizes = [elem['size'] for elem in elements]
         size_counts = Counter(font_sizes)
         
-        print("📊 Font size distribution:")
+        print("Font size distribution:")
         for size, count in sorted(size_counts.items(), reverse=True):
             print(f"   Size {size:.1f}: {count} elements")
         
@@ -136,14 +136,14 @@ class OCR:
         avg_size = sum(font_sizes) / len(font_sizes)
         headers = [elem for elem in elements if elem['size'] > avg_size * 1.2]
         
-        print(f"\n📋 Likely headers ({len(headers)} found):")
+        print(f"\nLikely headers ({len(headers)} found):")
         for header in headers[:5]:  # Show first 5
             text_preview = header['text'][:50].replace('\n', ' ')
             print(f"   '{text_preview}' (size: {header['size']:.1f})")
         
         # Identify fonts used
         fonts = set(elem['font'] for elem in elements)
-        print(f"\n🔤 Fonts detected: {len(fonts)}")
+        print(f"\nFonts detected: {len(fonts)}")
         for font in sorted(fonts)[:5]:  # Show first 5
             print(f"   {font}")
     
@@ -177,20 +177,56 @@ class OCR:
         else:
             return "general"
     
-    def clean_academic_document(self, text: str) -> str:
+    def clean_academic_document(self, text: str, remove_headers: bool = True) -> str:
         """
         Clean academic documents by removing headers, footers, and standardizing format.
         
         Args:
             text: Raw text to clean
+            remove_headers: Whether to remove common headers/footers
             
         Returns:
             Cleaned text
         """
-        print("🧹 Applying academic document cleaning...")
+        print("Applying academic document cleaning...")
         
         # Remove URLs
         text = re.sub(r'http[s]?://[^\s]+', '[URL]', text)
+        
+        if remove_headers:
+            # Remove common university headers
+            header_patterns = [
+                r'^THE UNIVERSITY OF VERMONT\s*$',
+                r'^ELECTRICAL ENGINEERING\s*$',
+                r'^[A-Z\s]+UNIVERSITY\s*$',
+                r'^[A-Z\s]+DEPARTMENT\s*$',
+                r'^[A-Z\s]+COLLEGE\s*$',
+            ]
+            
+            lines = text.split('\n')
+            filtered_lines = []
+            
+            for line in lines:
+                line_stripped = line.strip()
+                is_header = False
+                
+                # Check if line matches header patterns
+                for pattern in header_patterns:
+                    if re.match(pattern, line_stripped, re.IGNORECASE):
+                        is_header = True
+                        print(f"   Removed header: '{line_stripped}'")
+                        break
+                
+                # Also remove lines that are all caps and short (likely headers)
+                if not is_header and len(line_stripped) > 0:
+                    if line_stripped.isupper() and len(line_stripped) < 50:
+                        is_header = True
+                        print(f"   Removed potential header: '{line_stripped}'")
+                
+                if not is_header:
+                    filtered_lines.append(line)
+            
+            text = '\n'.join(filtered_lines)
         
         # Standardize course codes (CMPE 5220. -> CMPE 5220:)
         text = re.sub(r'([A-Z]{2,4}\s+\d{4})\.\s*', r'\1: ', text)
@@ -217,7 +253,7 @@ class OCR:
         Returns:
             Cleaned text
         """
-        print("🧹 Applying legal document cleaning...")
+        print("Applying legal document cleaning...")
         
         # Standardize legal formatting
         text = re.sub(r'STATE\s+OF\s+([A-Z]+)\s*\)', r'STATE OF \1)', text)
@@ -276,7 +312,7 @@ class OCR:
         Returns:
             Fixed text
         """
-        print("🔧 Fixing OCR errors...")
+        print("Fixing OCR errors...")
         
         # Character substitution fixes
         fixes = [
@@ -326,15 +362,15 @@ class OCR:
             doc.close()
             
             if len(text) > 50:  # Arbitrary threshold
-                print(f"✓ PDF has extractable text ({len(text)} characters)")
+                print(f"PDF has extractable text ({len(text)} characters)")
                 print(f"   Preview: '{text[:100]}...'")
                 return True
             else:
-                print(f"✗ PDF has little/no extractable text ({len(text)} characters)")
+                print(f"PDF has little/no extractable text ({len(text)} characters)")
                 return False
                 
         except Exception as e:
-            print(f"✗ Error checking PDF: {e}")
+            print(f"Error checking PDF: {e}")
             return False
     
     def analyze_extraction_quality(self, text: str, doc_name: str) -> Tuple[Dict[str, int], Dict[str, List[str]]]:
@@ -349,7 +385,7 @@ class OCR:
             Tuple of (issues_dict, issues_with_content)
         """
         if not text:
-            print(f"✗ No text to analyze for {doc_name}")
+            print(f"No text to analyze for {doc_name}")
             return {}, {}
         
         issues = {}
@@ -379,7 +415,7 @@ class OCR:
         long_lines = [line for line in lines if len(line) > 200]
         issues['very_long_lines'] = len(long_lines)
         
-        print(f"\n📊 {doc_name} Extraction Analysis:")
+        print(f"\n{doc_name} Extraction Analysis:")
         for issue, count in issues.items():
             print(f"   • {issue.replace('_', ' ').title()}: {count}")
         
@@ -408,7 +444,7 @@ class OCR:
         Returns:
             Dictionary with comparison statistics
         """
-        print(f"\n📈 {doc_name} Processing Results:")
+        print(f"\n{doc_name} Processing Results:")
         print(f"   Original length: {len(original)} characters")
         print(f"   After cleaning:  {len(cleaned)} characters ({len(cleaned)-len(original):+d})")
         print(f"   After OCR fixes: {len(fixed)} characters ({len(fixed)-len(cleaned):+d})")
@@ -436,8 +472,8 @@ class OCR:
         Returns:
             Dictionary with processing results
         """
-        print(f"🚀 Starting PDF processing for: {pdf_path}")
-        print("📋 Using PyMuPDF for text extraction and processing")
+        print(f"Starting PDF processing for: {pdf_path}")
+        print("Using PyMuPDF for text extraction and processing")
         
         # Create output directory
         output_path = Path(output_dir)
@@ -446,51 +482,51 @@ class OCR:
         results = {}
         
         # Step 1: Extract text using PyMuPDF
-        print("\n🔍 Step 1: Extracting text with PyMuPDF...")
+        print("\nStep 1: Extracting text with PyMuPDF...")
         pages_data = self.extract_text_from_pdf(pdf_path)
         
         if pages_data and any(page['text'].strip() for page in pages_data):
             # PyMuPDF extraction successful
-            print("✅ PyMuPDF extraction successful!")
+            print("PyMuPDF extraction successful!")
             
             full_text = "\n".join([page['text'] for page in pages_data])
             
             # Analyze document structure
-            print("\n📊 Step 2: Analyzing document structure...")
+            print("\nStep 2: Analyzing document structure...")
             layout_elements = self.extract_with_layout(pdf_path, 0)
             if layout_elements:
                 self.analyze_document_structure(layout_elements)
             
             # Detect document type and clean
-            print("\n🧹 Step 3: Cleaning and processing text...")
+            print("\nStep 3: Cleaning and processing text...")
             doc_type = self.detect_document_type(full_text)
-            print(f"📄 Document detected as: {doc_type}")
+            print(f"Document detected as: {doc_type}")
             
             if doc_type == "academic":
-                cleaned_text = self.clean_academic_document(full_text)
+                cleaned_text = self.clean_academic_document(full_text, remove_headers=True)
             elif doc_type == "legal":
                 cleaned_text = self.clean_legal_document(full_text)
             else:
                 cleaned_text = full_text
             
             # Find and fix potential errors
-            print("\n🔧 Step 4: Error detection and correction...")
+            print("\nStep 4: Error detection and correction...")
             errors, _, _, _ = self.find_ocr_errors(cleaned_text)
-            print("🔍 Potential issues found:")
+            print("Potential issues found:")
             for error_type, count in errors.items():
                 print(f"   • {error_type.replace('_', ' ').title()}: {count}")
             
             fixed_text = self.fix_ocr_errors(cleaned_text)
             
             # Compare versions
-            print("\n📈 Step 5: Quality assessment...")
+            print("\nStep 5: Quality assessment...")
             comparison = self.compare_versions(full_text, cleaned_text, fixed_text, "PDF Document")
             
             # Save processed text
             output_file = output_path / f"{Path(pdf_path).stem}_processed.txt"
             with open(output_file, 'w', encoding='utf-8') as f:
                 f.write(fixed_text)
-            print(f"💾 Saved: {output_file}")
+            print(f"Saved: {output_file}")
             
             results = {
                 'method': 'pymupdf_extraction',
@@ -504,8 +540,8 @@ class OCR:
             
         else:
             # PyMuPDF extraction failed or returned empty text
-            print("❌ PyMuPDF extraction failed or returned empty text")
-            print("💡 This might be a scanned PDF or image-based document.")
+            print("PyMuPDF extraction failed or returned empty text")
+            print("This might be a scanned PDF or image-based document.")
             print("   Consider using a different PDF or checking if the file is corrupted.")
             
             results = {
@@ -513,5 +549,5 @@ class OCR:
                 'error': 'PyMuPDF extraction failed - possibly a scanned/image-based PDF'
             }
         
-        print("\n✅ PDF processing complete!")
+        print("\nPDF processing complete!")
         return results
