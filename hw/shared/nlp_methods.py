@@ -126,6 +126,7 @@ class NLPMethods:
         """
         Extract anything between double quotes.
         Returns list of quoted text.
+        example: extract_quotes("He said 'Hello' and then 'Goodbye' to everyone.") -> ['Hello', 'Goodbye']
         """
         all_quotes = []
         for pattern in self.QUOTE_EXTRACTION_PATTERNS:
@@ -137,6 +138,7 @@ class NLPMethods:
     def remove_quotes(self, text):
         """
         Remove all quoted text from the content, leaving only narrative/non-dialogue.
+        example: remove_quotes("He said 'Hello' and then 'Goodbye' to everyone.") -> "He said and then to everyone."
         """
         non_quote_text = text
         for pattern in self.QUOTE_REMOVAL_PATTERNS:
