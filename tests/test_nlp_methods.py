@@ -152,3 +152,72 @@ class TestNLPMethods:
 
         assert result == "She said and then to the guests."
         assert isinstance(result, str)
+
+    def test_get_chapter_data_basic_functionality(self, nlp_instance):
+        """
+        Test get_chapter_data with basic chapter extraction.
+
+        This test verifies that the function correctly extracts chapter data
+        including content, metrics, and handles the dedication marker removal.
+        """
+        # Create test text with dedication marker and chapters
+        test_text = """Some preamble text here.
+
+To Romain Rolland, my dear friend
+
+CHAPTER I: THE BEGINNING
+This is the content of the first chapter. It contains multiple sentences. 
+The chapter discusses various topics and provides detailed information.
+It has enough content to meet the minimum length requirement.
+
+CHAPTER II: THE MIDDLE
+This is the content of the second chapter. It also contains multiple sentences.
+The chapter continues the narrative and provides more detailed information.
+It meets the minimum content length requirement as well.
+
+CHAPTER III: THE END
+This is the final chapter content. It concludes the narrative.
+It provides a satisfying ending to the story.
+"""
+
+        chapters = [
+            "CHAPTER I: THE BEGINNING",
+            "CHAPTER II: THE MIDDLE",
+            "CHAPTER III: THE END",
+        ]
+
+        result = nlp_instance.get_chapter_data(chapters, test_text)
+
+        # Verify we got results for all chapters
+        assert len(result) == 3
+
+        # Test first chapter
+        first_chapter = result[0]
+        assert first_chapter["chapter_title"] == "CHAPTER I: THE BEGINNING"
+        assert first_chapter["chapter_number"] == 1
+        assert first_chapter["sentence_count"] > 0
+        assert first_chapter["word_count"] > 0
+        assert first_chapter["token_count"] > 0
+        assert first_chapter["character_count"] > 100
+        assert "This is the content of the first chapter" in first_chapter["content"]
+
+        # Test second chapter
+        second_chapter = result[1]
+        assert second_chapter["chapter_title"] == "CHAPTER II: THE MIDDLE"
+        assert second_chapter["chapter_number"] == 2
+        assert second_chapter["sentence_count"] > 0
+        assert second_chapter["word_count"] > 0
+        assert "This is the content of the second chapter" in second_chapter["content"]
+
+        # Test third chapter
+        third_chapter = result[2]
+        assert third_chapter["chapter_title"] == "CHAPTER III: THE END"
+        assert third_chapter["chapter_number"] == 3
+        assert third_chapter["sentence_count"] > 0
+        assert third_chapter["word_count"] > 0
+        assert "This is the final chapter content" in third_chapter["content"]
+
+        # Verify that dedication marker was removed from content
+        for chapter in result:
+            assert "To Romain Rolland, my dear friend" not in chapter["content"]
+            assert "Some preamble text here" not in chapter["content"]
